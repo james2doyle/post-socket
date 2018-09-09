@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Websocket Listener</title>
+</head>
+<body>
+  <div id="connection">
+    <form accept-charset="utf-8" onsubmit="return false;">
+      <p><button type="submit" id="connect">Connect</button></p>
+    </form>
+  </div>
+  <div id="controls" style="display: none">
+    <p><button type="button" id="emit">Emit</button></p>
+    <p><em>Messages from socket:</em></p>
+  </div>
+  <pre id="output"></pre>
+  <script>
+    function createConnection() {
+      const connection = document.getElementById('connection');
+      const controls = document.getElementById('controls');
+      const emit = document.getElementById('emit');
+      const output = document.getElementById('output');
+
+      // Create WebSocket connection.
+      const socket = new WebSocket('ws://localhost:8081');
+      socket.addEventListener('open', (e) => {
+        console.log(e);
+        connection.style.display = 'none';
+        controls.style.display = 'block';
+        emit.focus();
+      });
+      socket.addEventListener('close', (e) => {
+        console.log(e);
+        output.innerHTML = 'socket closed';
+      });
+      socket.addEventListener('error', (e) => {
+        console.log(e);
+        output.innerHTML = 'socket error';
+      });
+
+      // Listen for messages and push to our array
+      socket.addEventListener('message', (event) => {
+        const data = JSON.parse(event.data);
+        output.innerHTML += `${JSON.stringify(data)}\n`;
+        console.log('data from ws:', data);
+      });
+
+      function emitSomething() {
+        const item = Date.now().toString();
+        fetch('http://localhost:8080', {
+          method: 'post',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            type: 'message',
+            message: item
+          })
+        })
+        .then(console.log.bind(console))
+        .catch(console.error.bind(console));
+      }
+
+      emit.addEventListener('click', emitSomething);
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      const connect = document.getElementById('connect');
+      connect.addEventListener('click', createConnection);
+    });
+  </script>
+</body>
+</html>

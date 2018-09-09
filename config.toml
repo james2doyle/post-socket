@@ -1,0 +1,3 @@
+WebhookPort = 8080
+WebsocketPort = 8081
+Logging = true
