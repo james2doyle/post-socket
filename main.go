@@ -1,7 +1,6 @@
 package main
 
 import (
-    "encoding/json"
     "fmt"
     "io/ioutil"
     "log"
@@ -19,10 +18,6 @@ type (
         WebhookPort   int
         WebsocketPort int
         Logging       bool
-    }
-    websocketMessage struct {
-        Type    string `json:"type"`
-        Message string `json:"message"`
     }
 )
 
@@ -109,11 +104,6 @@ func handleWebsocket() http.HandlerFunc {
                 if msg == nil {
                     break
                 }
-                if err != nil {
-                    logger("%s", err)
-                }
-                var message websocketMessage
-                err = json.Unmarshal(msg, &message)
                 if err != nil {
                     logger("%s", err)
                 }
