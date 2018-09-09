@@ -3,6 +3,7 @@ package main
 import (
   "fmt"
   "net/http"
+  "net/url"
   "os"
   "strings"
   "testing"
@@ -44,6 +45,27 @@ func Test_Preflight_Request(t *testing.T) {
     So(resp.Header.Get("Access-Control-Allow-Origin"), ShouldEqual, "*")
     So(resp.Header.Get("Access-Control-Allow-Headers"), ShouldEqual, "Content-Type, Origin, Accept, token")
     So(resp.Header.Get("Access-Control-Allow-Methods"), ShouldEqual, "GET,POST,OPTIONS")
+  })
+}
+
+func Test_Non_JSON_Request(t *testing.T) {
+  Convey("It can accept a post request and convert it to a websocket message", t, func() {
+    defer func() {
+      So(recover(), ShouldBeNil)
+    }()
+
+    webhookURL := fmt.Sprintf("%s://%s:%d", "http", "localhost", conf.WebhookPort)
+    form := url.Values{}
+    form.Add("type", "message")
+    form.Add("message", "my cool message")
+    // send the post request
+    req, err := http.NewRequest(http.MethodPost, webhookURL, strings.NewReader(form.Encode()))
+    So(err, ShouldBeNil)
+    req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+    client := &http.Client{}
+    resp, err := client.Do(req)
+    So(err, ShouldBeNil)
+    So(resp.StatusCode, ShouldEqual, http.StatusBadRequest)
   })
 }
 

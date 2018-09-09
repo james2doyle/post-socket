@@ -58,7 +58,7 @@ func handleWebhook() http.HandlerFunc {
 
         if r.Header.Get("Content-Type") != "application/json" {
             logger("%s", "content-type not application/json")
-            http.Error(w, "content-type must be application/json", http.StatusMethodNotAllowed)
+            http.Error(w, "content-type must be application/json", http.StatusBadRequest)
             return
         }
 
