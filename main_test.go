@@ -65,7 +65,7 @@ func Test_Post_Request_And_Websocket_Event(t *testing.T) {
     // send the post request
     resp, err := http.Post(webhookURL, "application/json", strings.NewReader(message))
     So(err, ShouldBeNil)
-    So(resp.StatusCode, ShouldEqual, http.StatusOK)
+    So(resp.StatusCode, ShouldEqual, http.StatusAccepted)
 
     // Read response and check to see if it's what we expect.
     _, p, err := ws.ReadMessage()

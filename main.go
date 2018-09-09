@@ -56,6 +56,12 @@ func handleWebhook() http.HandlerFunc {
             return
         }
 
+        if r.Header.Get("Content-Type") != "application/json" {
+            logger("%s", "content-type not application/json")
+            http.Error(w, "content-type must be application/json", http.StatusMethodNotAllowed)
+            return
+        }
+
         // Read body
         msg, err := ioutil.ReadAll(r.Body)
         if msg == nil {
@@ -80,8 +86,7 @@ func handleWebhook() http.HandlerFunc {
             }
         }
 
-        w.WriteHeader(http.StatusOK)
-        fmt.Fprint(w, "sent websocket message for client")
+        w.WriteHeader(http.StatusAccepted)
     }
 }
 
